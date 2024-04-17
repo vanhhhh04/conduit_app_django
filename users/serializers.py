@@ -1,12 +1,7 @@
 from rest_framework import serializers
 from .models import User 
 
-class Userserializer(serializers.Serializer):
-    email = serializers.EmailField()
-    username = serializers.CharField(max_length = 100)
-    password = serializers.CharField(max_length = 100)
-    bio = serializers.CharField(max_length = 100, required=False)
-    image = serializers.CharField(max_length = 100, required = False)
+class Userserializer(serializers.ModelSerializer):
 
     class Meta:
         model = User 

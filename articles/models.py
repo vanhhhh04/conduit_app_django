@@ -7,8 +7,8 @@ class Article(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     body = models.TextField()
-    createdAt = models.DateTimeField()
-    updatedAt = models.DateTimeField()
+    createdAt = models.DateTimeField(null=False, blank=False)
+    updatedAt = models.DateTimeField(null=False, blank=False)
 
 class Comment(models.Model):
 
@@ -20,7 +20,6 @@ class Comment(models.Model):
 class Tag(models.Model):
     article = models.ManyToManyField(Article)
     tag_name = models.CharField(max_length=100)
-
 
 
 class Favorite(models.Model):

@@ -46,9 +46,13 @@ def user_login(request):
                     "detail": "User Doesnot exist!"
                 }
             }
-            email = serializer.validated_data.get('email') 
+            email = serializer.validated_data.get('email')
             password = serializer.validated_data.get('password')
-            user = User.objects.get(email=email) 
+            user = User.objects.filter(email=email).exists() 
+            if not user : 
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(email=email)
+            print(type(user))
             if user.check_password(password) :
                 token, created = Token.objects.get_or_create(user=user)
                 # print(Token.objects.get_or_create(user=user))
@@ -58,15 +62,14 @@ def user_login(request):
                     "username":user.username,
                     "bio":user.bio,
                     "image":user.image
-                     }
+                    }
                 }
                 return Response(response, status=status.HTTP_200_OK)
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-@api_view(['GET'])
+@api_view(['GET','PUT'])
 def get_or_update_user(request):
     if request.method == "GET":
         if request.user.is_authenticated : 
@@ -80,14 +83,52 @@ def get_or_update_user(request):
                     }
                 }
             return Response(response, status=status.HTTP_200_OK)
-    
+
     if request.method == "PUT":
         if request.user.is_authenticated :
-            update_data = request.data 
+            update_data = request.data["user"]
+            print(update_data)
+            email = update_data.get("email")
+            password = update_data.get("password")
+            image = update_data.get("image")
+            bio = update_data.get("bio")
             serializer = UserLoginSerializer(data = update_data)
-            user = User.objects.update()
+            if serializer.is_valid:
+                user = User.objects.filter(pk = request.user.id)
+                user = User(id = request.user.id, email = email, image=image, bio=bio)
+                if password : 
+                    user.set_password(password)
+                user.save()
+                response = {"user" : { 
+                    "email":user.email, 
+                    "username":user.username, 
+                    "bio":user.bio, 
+                    "image":user.image 
+                    } 
+                }
+            return Response(response, status=status.HTTP_200_OK) 
+ 
+ 
+ 
+@api_view(['GET'])
+def get_profile(request,username):
+    if request.method == "GET":
+        user_profile = User.objects.filter(username = username).exists()
+        if user_profile :
+            user_profile = User.objects.get(username = username)
+            response = {
+                "profile" : {
+                    "username": user_profile.username, 
+                    "bio": user_profile.bio, 
+                    "image": user_profile.image, 
+                    "following": False 
+                } 
+            } 
+            return Response(response, status=status.HTTP_200_OK)
+        response = {
+                "username": {
+                    "detail": "User Doesnot exist!"
+                }
+            }
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view([''])
-def get_profile(request):
-    pass 
