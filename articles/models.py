@@ -1,14 +1,15 @@
 from django.db import models
 from users.models import User
+import datetime 
 # Create your models here.
 class Article(models.Model):
-    author = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
-    slug = models.SlugField()
+    author = models.OneToOneField(User, on_delete=models.SET_NULL, null=True,unique=False)
+    slug = models.SlugField(null = True,blank = True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     body = models.TextField()
-    createdAt = models.DateTimeField(null=False, blank=False)
-    updatedAt = models.DateTimeField(null=False, blank=False)
+    createdAt = models.DateTimeField(null=False, blank=False, auto_now_add=datetime.datetime.now())
+    updatedAt = models.DateTimeField(null=False, blank=False, auto_now_add=datetime.datetime.now())
 
 class Comment(models.Model):
 
@@ -18,8 +19,9 @@ class Comment(models.Model):
     body = models.TextField()
 
 class Tag(models.Model):
-    article = models.ManyToManyField(Article)
+    article = models.ManyToManyField(Article, related_name="tags")
     tag_name = models.CharField(max_length=100)
+
 
 
 class Favorite(models.Model):
