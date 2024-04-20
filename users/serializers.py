@@ -1,15 +1,20 @@
 from rest_framework import serializers
 from .models import User 
 
-# class Userserializer(serializers.ModelSerializer):
+class Userserializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = User 
-#         fields = ["username","bio","image"]
-class Userserializer(serializers.Serializer):
-    username = serializers.CharField()
-    bio = serializers.CharField()
-    image = serializers.CharField()
+    class Meta:
+        model = User 
+        fields = ["username","bio","image","email"]
+        extra_kwargs = {
+            "username": {"required": True},
+            "email": {"required": True, "write_only": True},
+            "password": {"required": True, "write_only":True},
+            "bio": {"required": False},
+            "image": {"required": False},
+        }
+
+
     def validate(self, data):
         email = data.get('email')
         if User.objects.filter(email=email).exists():

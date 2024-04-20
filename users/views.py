@@ -13,13 +13,26 @@ from rest_framework import status
 def user_register(request):
     if request.method == "POST":
         user_info = request.data.get("user")
+        print(user_info)
+        # {'username': 'Jacob', 'email': 'jake@jake.jake', 'password': 'jakejake'}
+        print(user_info.keys())
         serializer = Userserializer(data=user_info)
         if serializer.is_valid():
+            print(serializer.validated_data)
+            # {'username': 'Jacob'}
             username = serializer.validated_data.get('username')
             email = serializer.validated_data.get('email')
+            if email : 
+                print(email)
+            else : 
+                print("hello")
             password = serializer.validated_data.get('password')
+            if password : 
+                print(password)
+            else : 
+                print("hello1")
             bio = serializer.validated_data.get('bio')
-            image = serializer.validated_data.get('bio')
+            image = serializer.validated_data.get('image')
             user = User.objects.create(username = username, email=email,bio=bio, image=image)
             user.set_password(password)
             user.save()
@@ -29,7 +42,7 @@ def user_register(request):
                     "username":user.username,
                     "bio":user.bio,
                     "image":user.image
-                     }
+                    }
                 }
             return Response(response, status=status.HTTP_200_OK)
         else:

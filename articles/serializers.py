@@ -18,7 +18,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = ["slug","title","description","body","createdAt","updatedAt","author"]
         extra_kwargs = {
             "description": {"required": False},
-            "body": {"required": False}
+            "body": {"required": False},
+            "title": {"required": False}
         }
 
 

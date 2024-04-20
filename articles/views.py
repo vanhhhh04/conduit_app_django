@@ -27,6 +27,7 @@ def list_articles(request):
                 # body = serializer.validated_data("body")
                 article = serializer.save()
                 article.author = request.user 
+                article.update_slug() 
                 article.save()
                 tagList = post_data.get("tagList",[])
 
@@ -40,12 +41,18 @@ def list_articles(request):
                 serializer = serializer.data 
                 serializer["tagList"] = tagList
                 
+                
                 return Response(serializer)
             else : 
                 return Response(serializer.errors)
         return Response(status = status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(["GET"])
+def check_slug(request):
+    if request.method == "GET":
+        article = Article.objects.get(pk=1)
+        print(article.update_slug())
+        return Response("message")
 
 
 
@@ -60,6 +67,7 @@ def list_tags(request):
             "tags": list_tag
         }
         return Response(response)
+    
 @api_view(["PUT"])
 def update_or_delete_article(request, slug):
     if request.method == "PUT":
@@ -68,24 +76,25 @@ def update_or_delete_article(request, slug):
                 article = Article.objects.get(slug=slug)
             except Article.DoesNotExist:
                 return Response({"error": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-            put_data = request.data.get("article")
-            serializer = ArticleSerializer(article, put_data)
-            if serializer.is_valid():
-                article = serializer.save()
-                tagList = []
-                tags = article.tags.all()
-                print(type(tags))
-                for i in tags :
-                    print(i)
-                    tagList.append(i.tag_name)
-                serializer = serializer.data 
-                serializer["tagList"] = tagList 
-                return Response(serializer)
-            else :
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status = status.HTTP_400_BAD_REQUEST)
-    if request.method == "DELETE":
-        if request.user.is_authenticated : 
-            
+            if request.user == article.author : 
+                put_data = request.data.get("article")
+                serializer = ArticleSerializer(article, put_data)
+                if serializer.is_valid():
+                    article = serializer.save()
+                    tagList = []
+                    tags = article.tags.all()
+                    print(type(tags))
+                    for i in tags :
+                        print(i)
+                        tagList.append(i.tag_name)
+                    serializer = serializer.data 
+                    serializer["tagList"] = tagList 
+                    return Response(serializer)
+                else :
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status = status.HTTP_400_BAD_REQUEST)
+    # if request.method == "DELETE" :
+    #     if request.user.is_authenticated :
+    #         author = 
 
 

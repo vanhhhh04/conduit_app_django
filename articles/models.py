@@ -10,6 +10,18 @@ class Article(models.Model):
     body = models.TextField()
     createdAt = models.DateTimeField(null=False, blank=False, auto_now_add=datetime.datetime.now())
     updatedAt = models.DateTimeField(null=False, blank=False, auto_now_add=datetime.datetime.now())
+    def update_slug(self):
+        if not self.slug :
+            slug = ""
+            title_list = self.title.split(" ")
+
+            for i in range(len(title_list)):
+                slug += title_list[i]
+                if i != len(title_list) - 1 : 
+                    slug += "-"
+            
+            self.slug = slug  
+            self.save()
 
 class Comment(models.Model):
 
