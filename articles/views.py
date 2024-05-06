@@ -20,15 +20,16 @@ def list_articles(request):
     if request.method == "POST":
         if request.user.is_authenticated:
             post_data = request.data.get("article")
+            
             serializer = ArticleSerializer(data = post_data)
             if serializer.is_valid() : 
                 # title = serializer.validated_data("title")
                 # description = serializer.validated_data("description")
                 # body = serializer.validated_data("body")
-                article = serializer.save()
+                article = serializer.save() 
                 article.author = request.user 
                 article.update_slug() 
-                article.save()
+                article.save() 
                 tagList = post_data.get("tagList",[])
 
                 for tag_name in tagList:
@@ -39,7 +40,7 @@ def list_articles(request):
                         tag = Tag.objects.create(tag_name=tag_name)
                         article.tags.add(tag)
                 serializer = serializer.data 
-                serializer["tagList"] = tagList
+                serializer["tagList"] = tagList 
                 
                 
                 return Response(serializer)
@@ -93,8 +94,24 @@ def update_or_delete_article(request, slug):
                 else :
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response(status = status.HTTP_400_BAD_REQUEST)
-    # if request.method == "DELETE" :
-    #     if request.user.is_authenticated :
-    #         author = 
+    if request.method == "DELETE" :
+        if request.user.is_authenticated :
+            try :
+                article = Article.objects.get(slug=slug)
+            except Article.DoesNotExist:
+                return Response({"error": "Article not found. "}, status = status.HTTP_400_BAD_REQUEST)
+            if request.user == article.author :
+                article.delete()
+                return Response({"message":"deleted succesfully"})
+            
+                
+                 
+                
 
 
+# @api_view(["POST"])
+# def comment_views(request, slug):
+#     if request.method == "POST":
+#         if request.user.is_authenticated:
+            
+    

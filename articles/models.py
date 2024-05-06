@@ -3,8 +3,8 @@ from users.models import User
 import datetime 
 # Create your models here.
 class Article(models.Model):
-    author = models.OneToOneField(User, on_delete=models.SET_NULL, null=True,unique=False)
-    slug = models.SlugField(null = True,blank = True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,unique=False)
+    slug = models.SlugField(null = True,blank = True, unique=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     body = models.TextField()
