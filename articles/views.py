@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from .models import Article,Tag
 
-from .serializers import ArticleSerializer
+from .serializers import ArticleSerializer, CommentSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status 
 # Create your views here.
@@ -39,6 +39,7 @@ def list_articles(request):
                     else :
                         tag = Tag.objects.create(tag_name=tag_name)
                         article.tags.add(tag)
+                print(serializer.data)
                 serializer = serializer.data 
                 serializer["tagList"] = tagList 
                 
@@ -68,7 +69,7 @@ def list_tags(request):
             "tags": list_tag
         }
         return Response(response)
-    
+
 @api_view(["PUT"])
 def update_or_delete_article(request, slug):
     if request.method == "PUT":
@@ -104,14 +105,32 @@ def update_or_delete_article(request, slug):
                 article.delete()
                 return Response({"message":"deleted succesfully"})
             
-                
-                 
+                             
                 
 
 
-# @api_view(["POST"])
-# def comment_views(request, slug):
-#     if request.method == "POST":
-#         if request.user.is_authenticated:
+
+@api_view(["POST"])
+def comment_views(request, slug):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            try: 
+                article = Article.objects.get(slug=slug)
+            except Article.DoesNotExist:
+                return Response({"message": "Article does not exist"}, status=status.HTTP_404_NOT_FOUND)
             
-    
+            comment_post_data = request.data.get("comment")
+            print(comment_post_data)
+            comment_post_data = comment_post_data.get("body")
+            print(comment_post_data)
+            serializer = CommentSerializer(data=comment_post_data)
+            
+            if serializer.is_valid():
+                serializer.save(article=article, author=request.user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+

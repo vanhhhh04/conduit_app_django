@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Article,Tag
+from .models import Article,Tag, Comment
 from users.serializers import Userserializer
 
 
@@ -21,8 +21,15 @@ class ArticleSerializer(serializers.ModelSerializer):
             "body": {"required": False},
             "title": {"required": False}
         }
+        
 
-
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["id", "body", "createdAt", "updatedAt", "author"]
+        read_only_fields = ["author", "createdAt", "updatedAt"]
+        
+    
         
 
 

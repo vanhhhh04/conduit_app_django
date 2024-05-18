@@ -39,11 +39,11 @@ class Userserializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         for key, value in validated_data.items():
-            if key == 'password':
-                instance.set_password(value)
+            if key == 'password': 
+                instance.set_password(value) 
             else:
                 setattr(instance, key, value)
-        instance.save()
+        instance.save() 
         return instance 
 class UserLogin(serializers.ModelSerializer):
     

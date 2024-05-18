@@ -2,6 +2,7 @@ from django.db import models
 from users.models import User
 import datetime 
 # Create your models here.
+
 class Article(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,unique=False)
     slug = models.SlugField(null = True,blank = True, unique=True)
